@@ -208,7 +208,33 @@ int main(int argc, char** argv)
 				printResultHex(&result, number_of_decimal_places);
 				bignumFree(&result);
 			} else {
-				printf("Feature not yet implemented!\n");
+				s = number_of_decimal_places;
+				if (benchmarking) {
+					printf("Displaying runtime of computing %ld places with %ld reruns:\n", number_of_decimal_places, runtime_reruns);
+					// Workatound to avoid free on uninitialized
+					bignumInit(&result, 1);
+					// temp is used to temporally store the result
+					struct bignum temp;
+					struct timespec start;
+					clock_gettime(CLOCK_MONOTONIC, &start);
+					for (size_t i = 0; i < runtime_reruns; i++) {
+						temp = mainImplementation(s + 1, s);
+						// Workaround to avoid memory leaks
+						bignumFree(&result);
+						result = temp;
+					}
+					struct timespec end;
+					clock_gettime(CLOCK_MONOTONIC, &end);
+					double time = end.tv_sec - start.tv_sec + 1e-9 * (end.tv_nsec - start.tv_nsec);
+					double avg_time = time/runtime_reruns;
+					printf("done after %f seconds, average time is %f seconds\n", time, avg_time);
+				} else {
+					printf("Printing %ld hexadecimal places after comma...\n", number_of_decimal_places);
+					result = mainImplementation(s + 1, s);
+				}
+				printf("Result: ");
+				bignumPrintDec(&result, number_of_decimal_places);
+				bignumFree(&result);
 			}
 			break;
 		case 1: 

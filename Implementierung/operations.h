@@ -15,6 +15,10 @@ struct bignum {
 	size_t subone;
 };
 
+void bignumPrintDec(const struct bignum *x, size_t totalDigits);
+
+void binaryConverter(uint8_t *buffer, uint32_t *num, uint32_t *num2, int bufferIndex, int len);
+
 void bignumInit(struct bignum *num, size_t n);
 
 void bignumFree(struct bignum *num);
